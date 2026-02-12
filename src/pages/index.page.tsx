@@ -1,64 +1,38 @@
-import { Box } from '@chakra-ui/react';
-import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { useTranslation } from 'next-i18next';
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 
-import { HeroBanner } from '@src/components/features/hero-banner';
-import { ProductTileGrid } from '@src/components/features/product';
-import { SeoFields } from '@src/components/features/seo';
-import { client, previewClient } from '@src/lib/client';
+import { CategoryGrid } from '@src/components/features/categories/CategoryGrid';
+import { PopularDeals } from '@src/components/features/deals/PopularDeals';
+import { HeroBannerCarousel } from '@src/components/features/hero-banner/HeroBannerCarousel';
+import { FeatureSection } from '@src/components/features/sections/FeatureSection';
+import { WhyChooseUs } from '@src/components/features/sections/WhyChooseUs';
 import { getServerSideTranslations } from '@src/pages/utils/get-serverside-translations';
 
-const Page = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { t } = useTranslation();
-  const page = useContentfulLiveUpdates(props.page);
-
+const Page = () => {
   return (
     <>
-      {page.seoFields && <SeoFields {...page.seoFields} />}
-      <HeroBanner {...page} />
-      {page.productsCollection?.items && (
-        <Box
-          mt={{
-            base: 5,
-            md: 9,
-            lg: 16,
-          }}>
-          <ProductTileGrid
-            title={t('product.trendingProducts')}
-            products={page.productsCollection.items}
-          />
-        </Box>
-      )}
+      <Head>
+        <title>VodafoneThree | Mobile Phones, SIM Only Deals &amp; Broadband</title>
+        <meta
+          name="description"
+          content="Explore the latest mobile phone deals, SIM only plans, broadband packages and more. Switch today and save."
+        />
+      </Head>
+      <HeroBannerCarousel />
+      <PopularDeals />
+      <CategoryGrid />
+      <FeatureSection />
+      <WhyChooseUs />
     </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ locale, preview }) => {
-  try {
-    const gqlClient = preview ? previewClient : client;
-
-    const data = await gqlClient.pageLanding({ locale, preview });
-
-    const page = data.pageLandingCollection?.items[0];
-
-    if (!page) {
-      return {
-        notFound: true,
-      };
-    }
-
-    return {
-      props: {
-        ...(await getServerSideTranslations(locale)),
-        page,
-      },
-    };
-  } catch {
-    return {
-      notFound: true,
-    };
-  }
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await getServerSideTranslations(locale)),
+    },
+  };
 };
 
 export default Page;
