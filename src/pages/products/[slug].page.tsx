@@ -4,12 +4,8 @@ import {
   Heading,
   Text,
   Flex,
-  Badge,
   Button,
   SimpleGrid,
-  List,
-  ListItem,
-  ListIcon,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -19,24 +15,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Product, getProductBySlug, getRelatedProducts, categoryLabels } from '@src/data/products';
+import { BasePageProductFieldsFragment } from '@src/lib/__generated/sdk';
+import { client, previewClient } from '@src/lib/client';
 import { getServerSideTranslations } from '@src/pages/utils/get-serverside-translations';
-
-const CheckIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#ff7b67"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ flexShrink: 0 }}
-  >
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
 
 const ChevronRightSmall = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -44,79 +25,77 @@ const ChevronRightSmall = () => (
   </svg>
 );
 
-const RelatedProductCard = ({ product }: { product: Product }) => (
-  <Box
-    as={Link}
-    href={`/products/${product.slug}`}
-    display="block"
-    bg="white"
-    borderRadius="xl"
-    overflow="hidden"
-    transition="all 0.25s"
-    _hover={{
-      transform: 'translateY(-4px)',
-      boxShadow: 'xl',
-    }}
-    border="1px solid"
-    borderColor="gray.100"
-  >
-    <Flex align="center" justify="center" h="180px" bg="#fdf2f0" position="relative" p={4}>
-      {product.badge && (
-        <Badge
-          position="absolute"
-          top={3}
-          left={3}
-          colorScheme={product.badgeColor}
-          borderRadius="full"
-          px={3}
-          py={1}
-          fontSize="xs"
-          fontWeight="600"
-          zIndex={1}
-        >
-          {product.badge}
-        </Badge>
-      )}
-      <Box position="relative" w="140px" h="140px">
-        <Image
-          src={product.imageUrl}
-          alt={product.imageAlt}
-          fill
-          style={{ objectFit: 'contain' }}
-          sizes="140px"
-        />
-      </Box>
-    </Flex>
-    <Box p={4}>
-      <Heading as="h3" fontSize="md" fontWeight="700" mb={1} color="gray.900" noOfLines={1}>
-        {product.name}
-      </Heading>
-      <Flex align="baseline" gap={1}>
-        <Text fontSize="lg" fontWeight="700" color="gray.900">
-          {product.price}
-        </Text>
-        <Text fontSize="xs" color="gray.500">
-          {product.pricePeriod}
-        </Text>
-      </Flex>
-    </Box>
-  </Box>
-);
+const RelatedProductCard = ({ product }: { product: BasePageProductFieldsFragment }) => {
+  const imageUrl =
+    product.featuredProductImage?.url || product.productImagesCollection?.items?.[0]?.url || '';
+  const price = product.price != null ? `£${product.price}` : '';
 
-const ProductPage = ({
-  product,
-  relatedProducts,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  return (
+    <Box
+      as={Link}
+      href={`/products/${product.slug || ''}`}
+      display="block"
+      bg="white"
+      borderRadius="xl"
+      overflow="hidden"
+      transition="all 0.25s"
+      _hover={{
+        transform: 'translateY(-4px)',
+        boxShadow: 'xl',
+      }}
+      border="1px solid"
+      borderColor="gray.100"
+    >
+      <Flex align="center" justify="center" h="180px" bg="#fdf2f0" position="relative" p={4}>
+        {imageUrl && (
+          <Box position="relative" w="140px" h="140px">
+            <Image
+              src={imageUrl}
+              alt={product.featuredProductImage?.title || product.name || ''}
+              fill
+              style={{ objectFit: 'contain' }}
+              sizes="140px"
+            />
+          </Box>
+        )}
+      </Flex>
+      <Box p={4}>
+        <Heading as="h3" fontSize="md" fontWeight="700" mb={1} color="gray.900" noOfLines={1}>
+          {product.name || 'Product'}
+        </Heading>
+        {price && (
+          <Flex align="baseline" gap={1}>
+            <Text fontSize="lg" fontWeight="700" color="gray.900">
+              {price}
+            </Text>
+            <Text fontSize="xs" color="gray.500">
+              /month
+            </Text>
+          </Flex>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+const ProductPage = ({ product }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (!product) return null;
+
+  const imageUrl =
+    product.featuredProductImage?.url || product.productImagesCollection?.items?.[0]?.url || '';
+  const price = product.price != null ? `£${product.price}` : '';
+  const relatedProducts = (product.relatedProductsCollection?.items ?? []).filter(
+    (p: BasePageProductFieldsFragment | null): p is BasePageProductFieldsFragment =>
+      p !== null && !!p.name,
+  );
 
   return (
     <>
       <Head>
         <title>
-          {product.name} | VodafoneThree - From {product.price}
-          {product.pricePeriod}
+          {product.name || 'Product'} | VodafoneThree{price ? ` - From ${price}/month` : ''}
         </title>
-        <meta name="description" content={product.longDescription || product.description} />
+        <meta name="description" content={product.description || ''} />
       </Head>
 
       {/* Gradient banner */}
@@ -143,14 +122,9 @@ const ProductPage = ({
                 Products
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbItem>
-              <BreadcrumbLink as={Link} href="/products" _hover={{ color: 'white' }}>
-                {categoryLabels[product.category]}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
               <BreadcrumbLink color="white" fontWeight="600">
-                {product.name}
+                {product.name || 'Product'}
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
@@ -179,79 +153,61 @@ const ProductPage = ({
               borderColor="gray.100"
               boxShadow="sm"
             >
-              <Box
-                position="relative"
-                w={{ base: '260px', md: '360px' }}
-                h={{ base: '260px', md: '360px' }}
-              >
-                <Image
-                  src={product.imageUrl}
-                  alt={product.imageAlt}
-                  fill
-                  style={{ objectFit: 'contain' }}
-                  sizes="(max-width: 768px) 260px, 360px"
-                  priority
-                />
-              </Box>
+              {imageUrl && (
+                <Box
+                  position="relative"
+                  w={{ base: '260px', md: '360px' }}
+                  h={{ base: '260px', md: '360px' }}
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={product.featuredProductImage?.title || product.name || ''}
+                    fill
+                    style={{ objectFit: 'contain' }}
+                    sizes="(max-width: 768px) 260px, 360px"
+                    priority
+                  />
+                </Box>
+              )}
             </Box>
 
             {/* Product info */}
             <Box flex="1" w="100%">
-              {product.badge && (
-                <Badge
-                  colorScheme={product.badgeColor}
-                  borderRadius="full"
-                  px={4}
-                  py={1}
-                  fontSize="sm"
-                  fontWeight="600"
-                  mb={3}
-                >
-                  {product.badge}
-                </Badge>
-              )}
-
               <Heading
                 as="h1"
                 fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}
                 fontWeight="700"
                 color="gray.900"
-                mb={2}
-              >
-                {product.name}
-              </Heading>
-
-              <Text
-                color="gray.500"
-                fontSize="sm"
-                textTransform="uppercase"
-                letterSpacing="wider"
                 mb={4}
               >
-                {categoryLabels[product.category]}
-              </Text>
+                {product.name || 'Product'}
+              </Heading>
 
-              <Flex
-                align="baseline"
-                gap={2}
-                mb={6}
-                bg="white"
-                p={4}
-                borderRadius="xl"
-                border="1px solid"
-                borderColor="gray.100"
-              >
-                <Text fontSize={{ base: '3xl', md: '4xl' }} fontWeight="700" color="gray.900">
-                  {product.price}
-                </Text>
-                <Text fontSize="lg" color="gray.500" fontWeight="500">
-                  {product.pricePeriod}
-                </Text>
-              </Flex>
+              {price && (
+                <Flex
+                  align="baseline"
+                  gap={2}
+                  mb={6}
+                  bg="white"
+                  p={4}
+                  borderRadius="xl"
+                  border="1px solid"
+                  borderColor="gray.100"
+                >
+                  <Text fontSize={{ base: '3xl', md: '4xl' }} fontWeight="700" color="gray.900">
+                    {price}
+                  </Text>
+                  <Text fontSize="lg" color="gray.500" fontWeight="500">
+                    /month
+                  </Text>
+                </Flex>
+              )}
 
-              <Text color="gray.700" fontSize={{ base: 'md', md: 'lg' }} lineHeight="1.7" mb={6}>
-                {product.longDescription}
-              </Text>
+              {product.description && (
+                <Text color="gray.700" fontSize={{ base: 'md', md: 'lg' }} lineHeight="1.7" mb={6}>
+                  {product.description}
+                </Text>
+              )}
 
               {/* CTA buttons */}
               <Flex gap={4} mb={8} flexWrap="wrap">
@@ -290,30 +246,6 @@ const ProductPage = ({
                   Compare plans
                 </Button>
               </Flex>
-
-              {/* Key highlights */}
-              {product.highlights && product.highlights.length > 0 && (
-                <Box bg="white" borderRadius="xl" p={6} border="1px solid" borderColor="gray.100">
-                  <Heading as="h2" fontSize="lg" fontWeight="700" color="gray.900" mb={4}>
-                    Key features
-                  </Heading>
-                  <List spacing={3}>
-                    {product.highlights.map((highlight, index) => (
-                      <ListItem
-                        key={index}
-                        display="flex"
-                        alignItems="center"
-                        gap={3}
-                        color="gray.700"
-                        fontSize="md"
-                      >
-                        <ListIcon as={() => <CheckIcon />} />
-                        {highlight}
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              )}
             </Box>
           </Flex>
         </Container>
@@ -423,7 +355,7 @@ const ProductPage = ({
       </Box>
 
       {/* Related products */}
-      {relatedProducts && relatedProducts.length > 0 && (
+      {relatedProducts.length > 0 && (
         <Box py={{ base: 10, md: 14 }} bg="white">
           <Container maxW="1200px">
             <Heading
@@ -436,11 +368,11 @@ const ProductPage = ({
               You might also like
             </Heading>
             <Text color="gray.600" mb={8} fontSize={{ base: 'sm', md: 'md' }}>
-              More from {categoryLabels[product.category]}
+              More products you may enjoy
             </Text>
             <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} spacing={6}>
-              {relatedProducts.map((rp: Product) => (
-                <RelatedProductCard key={rp.slug} product={rp} />
+              {relatedProducts.map((rp: BasePageProductFieldsFragment) => (
+                <RelatedProductCard key={rp.sys.id} product={rp} />
               ))}
             </SimpleGrid>
             <Flex justify="center" mt={10}>
@@ -470,26 +402,30 @@ const ProductPage = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, locale, preview }) => {
   if (!params?.slug || typeof params.slug !== 'string') {
     return { notFound: true };
   }
 
-  const product = getProductBySlug(params.slug);
+  const gqlClient = preview ? previewClient : client;
 
-  if (!product) {
+  try {
+    const data = await gqlClient.pageProduct({ slug: params.slug, locale, preview });
+    const product = data.pageProductCollection?.items[0];
+
+    if (!product) {
+      return { notFound: true };
+    }
+
+    return {
+      props: {
+        ...(await getServerSideTranslations(locale)),
+        product,
+      },
+    };
+  } catch {
     return { notFound: true };
   }
-
-  const relatedProducts = getRelatedProducts(product, 4);
-
-  return {
-    props: {
-      ...(await getServerSideTranslations(locale)),
-      product,
-      relatedProducts,
-    },
-  };
 };
 
 export default ProductPage;

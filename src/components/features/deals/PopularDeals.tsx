@@ -1,6 +1,8 @@
-import { Box, Container, Heading, Text, SimpleGrid, Flex, Badge, Button } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, SimpleGrid, Flex, Button } from '@chakra-ui/react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+import { PageProductFieldsFragment } from '@src/lib/__generated/sdk';
 
 interface Deal {
   name: string;
@@ -8,23 +10,19 @@ interface Deal {
   description: string;
   price: string;
   pricePeriod: string;
-  badge?: string;
-  badgeColor?: string;
   imageUrl: string;
   imageAlt: string;
   bgColor: string;
   slug: string;
 }
 
-const deals: Deal[] = [
+const defaultDeals: Deal[] = [
   {
     name: 'iPhone 15',
     promotion: '3 months half price',
     description: 'On selected pay monthly plans when you switch to us.',
     price: '£35.99',
     pricePeriod: '/month',
-    badge: 'Popular',
-    badgeColor: 'red',
     imageUrl:
       'https://www.three.co.uk/content/dam/threedigital/new-dam-structure-temp/device-images/phones/apple/iphone-15/popular-deals-tile-620px-iphone15-pink-dmcd.png',
     imageAlt: 'iPhone 15 in Pink',
@@ -37,8 +35,6 @@ const deals: Deal[] = [
     description: 'Get 512GB for the price of 256GB. Online exclusive.',
     price: '£39.99',
     pricePeriod: '/month',
-    badge: 'New',
-    badgeColor: 'purple',
     imageUrl:
       'https://www.three.co.uk/content/dam/threedigital/new-dam-structure-temp/device-images/phones/samsung/s25-range/hub-and-series-page/620x620-samsung-s25-blue.png',
     imageAlt: 'Samsung Galaxy S25 in Blue',
@@ -51,8 +47,6 @@ const deals: Deal[] = [
     description: 'Unlimited data, calls and texts. 30-day rolling contract available.',
     price: '£10',
     pricePeriod: '/month',
-    badge: 'Best Seller',
-    badgeColor: 'green',
     imageUrl:
       'https://www.three.co.uk/content/dam/threedigital/new-dam-structure-temp/device-images/sim/sim-630px-new.png',
     imageAlt: 'Three SIM Card',
@@ -77,8 +71,6 @@ const deals: Deal[] = [
     description: 'The latest foldable phone. Incredible display, ultra-thin design.',
     price: '£52.99',
     pricePeriod: '/month',
-    badge: 'Hot',
-    badgeColor: 'orange',
     imageUrl:
       'https://www.three.co.uk/content/dam/threedigital/new-dam-structure-temp/device-images/phones/honor/magic-v5/620x620-honor-magic-v5-black.png',
     imageAlt: 'HONOR Magic V5 in Black',
@@ -99,7 +91,39 @@ const deals: Deal[] = [
   },
 ];
 
-export const PopularDeals = () => {
+function buildDealsFromProducts(products: Array<PageProductFieldsFragment | null>): Deal[] {
+  const validProducts = products.filter(
+    (p): p is PageProductFieldsFragment => p !== null && !!p.name,
+  );
+
+  if (validProducts.length === 0) return defaultDeals;
+
+  return validProducts.slice(0, 6).map(product => {
+    const imageUrl =
+      product.featuredProductImage?.url || product.productImagesCollection?.items?.[0]?.url || '';
+    const price = product.price != null ? `£${product.price}` : '';
+
+    return {
+      name: product.name || 'Product',
+      promotion: price ? `From ${price}/month` : 'Check it out',
+      description: product.description || '',
+      price: price || '—',
+      pricePeriod: price ? '/month' : '',
+      imageUrl,
+      imageAlt: product.featuredProductImage?.title || product.name || '',
+      bgColor: '#fdf2f0',
+      slug: product.slug || '',
+    };
+  });
+}
+
+interface PopularDealsProps {
+  products?: Array<PageProductFieldsFragment | null>;
+}
+
+export const PopularDeals = ({ products }: PopularDealsProps) => {
+  const deals = products && products.length > 0 ? buildDealsFromProducts(products) : defaultDeals;
+
   return (
     <Box py={{ base: 12, md: 16 }} bg="white">
       <Container maxW="1200px">
@@ -144,31 +168,17 @@ export const PopularDeals = () => {
                 position="relative"
                 p={4}
               >
-                {deal.badge && (
-                  <Badge
-                    position="absolute"
-                    top={3}
-                    left={3}
-                    colorScheme={deal.badgeColor}
-                    borderRadius="full"
-                    px={3}
-                    py={1}
-                    fontSize="xs"
-                    fontWeight="600"
-                    zIndex={1}
-                  >
-                    {deal.badge}
-                  </Badge>
+                {deal.imageUrl && (
+                  <Box position="relative" w="160px" h="160px">
+                    <Image
+                      src={deal.imageUrl}
+                      alt={deal.imageAlt}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      sizes="160px"
+                    />
+                  </Box>
                 )}
-                <Box position="relative" w="160px" h="160px">
-                  <Image
-                    src={deal.imageUrl}
-                    alt={deal.imageAlt}
-                    fill
-                    style={{ objectFit: 'contain' }}
-                    sizes="160px"
-                  />
-                </Box>
               </Flex>
 
               {/* Card content */}

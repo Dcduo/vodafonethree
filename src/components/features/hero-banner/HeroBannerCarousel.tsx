@@ -2,6 +2,8 @@ import { Box, Flex, Heading, Text, Button, Container, IconButton } from '@chakra
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 
+import { PageProductFieldsFragment } from '@src/lib/__generated/sdk';
+
 interface BannerSlide {
   title: string;
   subtitle: string;
@@ -14,7 +16,7 @@ interface BannerSlide {
   imageAlt: string;
 }
 
-const slides: BannerSlide[] = [
+const defaultSlides: BannerSlide[] = [
   {
     title: 'iPhone 17',
     subtitle: '3 months half price',
@@ -66,16 +68,58 @@ const slides: BannerSlide[] = [
   },
 ];
 
-export const HeroBannerCarousel = () => {
+const gradientPalette = [
+  { bgGradient: 'linear(to-br, #1a1a2e, #16213e, #0f3460)', accentColor: '#e94560' },
+  { bgGradient: 'linear(to-br, #0d7377, #14a3a8, #32e0c4)', accentColor: '#32e0c4' },
+  { bgGradient: 'linear(to-br, #2d1b69, #5c3d99, #8b5cf6)', accentColor: '#c4b5fd' },
+  { bgGradient: 'linear(to-br, #1b4332, #2d6a4f, #52b788)', accentColor: '#95d5b2' },
+  { bgGradient: 'linear(to-br, #7f1d1d, #991b1b, #dc2626)', accentColor: '#fca5a5' },
+  { bgGradient: 'linear(to-br, #78350f, #92400e, #d97706)', accentColor: '#fde68a' },
+];
+
+function buildSlidesFromProducts(products: Array<PageProductFieldsFragment | null>): BannerSlide[] {
+  const validProducts = products.filter(
+    (p): p is PageProductFieldsFragment => p !== null && !!p.name,
+  );
+
+  if (validProducts.length === 0) return defaultSlides;
+
+  return validProducts.slice(0, 6).map((product, index) => {
+    const palette = gradientPalette[index % gradientPalette.length];
+    const imageUrl =
+      product.featuredProductImage?.url || product.productImagesCollection?.items?.[0]?.url || '';
+    const price = product.price != null ? `£${product.price}` : '';
+
+    return {
+      title: product.name || 'Product',
+      subtitle: price ? `From ${price}/month` : 'Check it out',
+      description: product.description || '',
+      ctaText: 'Shop now',
+      ctaLink: `/products/${product.slug || ''}`,
+      bgGradient: palette.bgGradient,
+      accentColor: palette.accentColor,
+      imageUrl,
+      imageAlt: product.featuredProductImage?.title || product.name || '',
+    };
+  });
+}
+
+interface HeroBannerCarouselProps {
+  products?: Array<PageProductFieldsFragment | null>;
+}
+
+export const HeroBannerCarousel = ({ products }: HeroBannerCarouselProps) => {
+  const slides =
+    products && products.length > 0 ? buildSlidesFromProducts(products) : defaultSlides;
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
     setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
@@ -151,16 +195,18 @@ export const HeroBannerCarousel = () => {
               position="relative"
               minH="350px"
             >
-              <Box position="relative" w="100%" h="350px">
-                <Image
-                  src={slide.imageUrl}
-                  alt={slide.imageAlt}
-                  fill
-                  style={{ objectFit: 'contain' }}
-                  priority={currentSlide === 0}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </Box>
+              {slide.imageUrl && (
+                <Box position="relative" w="100%" h="350px">
+                  <Image
+                    src={slide.imageUrl}
+                    alt={slide.imageAlt}
+                    fill
+                    style={{ objectFit: 'contain' }}
+                    priority={currentSlide === 0}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </Box>
+              )}
             </Flex>
           </Flex>
         </Container>
