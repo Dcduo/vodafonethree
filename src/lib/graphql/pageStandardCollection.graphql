@@ -1,0 +1,7 @@
+query pageStandardCollection($locale: String, $preview: Boolean) {
+  pageStandardCollection(locale: $locale, preview: $preview) {
+    items {
+      slug
+    }
+  }
+}

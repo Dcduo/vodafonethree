@@ -1213,6 +1213,50 @@ export type SitemapPagesQuery = (
   & SitemapPagesFieldsFragment
 );
 
+export type ComponentBannerFieldsFragment = { __typename: 'ComponentBanner', headline?: string | null, subheadline?: string | null, ctaText?: string | null, ctaUrl?: string | null, sys: { __typename?: 'Sys', id: string }, image?: (
+    { __typename?: 'Asset' }
+    & ImageFieldsFragment
+  ) | null };
+
+export type ComponentInfoBlockFieldsFragment = { __typename: 'ComponentInfoBlock', heading?: string | null, body?: string | null, sys: { __typename?: 'Sys', id: string }, icon?: (
+    { __typename?: 'Asset' }
+    & ImageFieldsFragment
+  ) | null };
+
+export type PageStandardFieldsFragment = { __typename: 'PageStandard', internalName?: string | null, title?: string | null, slug?: string | null, sys: { __typename?: 'Sys', id: string, spaceId: string }, bannerPrimary?: (
+    { __typename?: 'ComponentBanner' }
+    & ComponentBannerFieldsFragment
+  ) | null, bannerSecondary?: (
+    { __typename?: 'ComponentBanner' }
+    & ComponentBannerFieldsFragment
+  ) | null, infoBlocksCollection?: { __typename?: 'PageStandardInfoBlocksCollection', items: Array<(
+      { __typename?: 'ComponentInfoBlock' }
+      & ComponentInfoBlockFieldsFragment
+    ) | null> } | null, seoFields?: (
+    { __typename?: 'ComponentSeo' }
+    & SeoFieldsFragment
+  ) | null };
+
+export type PageStandardQueryVariables = Exact<{
+  slug: Scalars['String'];
+  locale?: InputMaybe<Scalars['String']>;
+  preview?: InputMaybe<Scalars['Boolean']>;
+}>;
+
+
+export type PageStandardQuery = { __typename?: 'Query', pageStandardCollection?: { __typename?: 'PageStandardCollection', items: Array<(
+      { __typename?: 'PageStandard' }
+      & PageStandardFieldsFragment
+    ) | null> } | null };
+
+export type PageStandardCollectionQueryVariables = Exact<{
+  locale?: InputMaybe<Scalars['String']>;
+  preview?: InputMaybe<Scalars['Boolean']>;
+}>;
+
+
+export type PageStandardCollectionQuery = { __typename?: 'Query', pageStandardCollection?: { __typename?: 'PageStandardCollection', items: Array<{ __typename?: 'PageStandard', slug?: string | null } | null> } | null };
+
 export const ImageFieldsFragmentDoc = gql`
     fragment ImageFields on Asset {
   __typename
@@ -1379,6 +1423,82 @@ export const SitemapPagesDocument = gql`
   ...sitemapPagesFields
 }
     ${SitemapPagesFieldsFragmentDoc}`;
+export const ComponentBannerFieldsFragmentDoc = gql`
+    fragment ComponentBannerFields on ComponentBanner {
+  __typename
+  sys {
+    id
+  }
+  headline
+  subheadline
+  image {
+    ...ImageFields
+  }
+  ctaText
+  ctaUrl
+}
+    `;
+export const ComponentInfoBlockFieldsFragmentDoc = gql`
+    fragment ComponentInfoBlockFields on ComponentInfoBlock {
+  __typename
+  sys {
+    id
+  }
+  heading
+  body
+  icon {
+    ...ImageFields
+  }
+}
+    `;
+export const PageStandardFieldsFragmentDoc = gql`
+    fragment PageStandardFields on PageStandard {
+  __typename
+  sys {
+    id
+    spaceId
+  }
+  internalName
+  title
+  slug
+  bannerPrimary {
+    ...ComponentBannerFields
+  }
+  bannerSecondary {
+    ...ComponentBannerFields
+  }
+  infoBlocksCollection(limit: 20) {
+    items {
+      ...ComponentInfoBlockFields
+    }
+  }
+  seoFields {
+    ...SeoFields
+  }
+}
+    `;
+export const PageStandardDocument = gql`
+    query pageStandard($slug: String!, $locale: String, $preview: Boolean) {
+  pageStandardCollection(limit: 1, where: {slug: $slug}, locale: $locale, preview: $preview) {
+    items {
+      ...PageStandardFields
+    }
+  }
+}
+    ${PageStandardFieldsFragmentDoc}
+${ComponentBannerFieldsFragmentDoc}
+${ImageFieldsFragmentDoc}
+${ComponentInfoBlockFieldsFragmentDoc}
+${SeoFieldsFragmentDoc}`;
+export const PageStandardCollectionDocument = gql`
+    query pageStandardCollection($locale: String, $preview: Boolean) {
+  pageStandardCollection(locale: $locale, preview: $preview) {
+    items {
+      slug
+    }
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -1401,6 +1521,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     sitemapPages(variables: SitemapPagesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SitemapPagesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<SitemapPagesQuery>(SitemapPagesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'sitemapPages', 'query');
+    },
+    pageStandard(variables: PageStandardQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<PageStandardQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PageStandardQuery>(PageStandardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'pageStandard', 'query');
+    },
+    pageStandardCollection(variables?: PageStandardCollectionQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<PageStandardCollectionQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PageStandardCollectionQuery>(PageStandardCollectionDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'pageStandardCollection', 'query');
     }
   };
 }
