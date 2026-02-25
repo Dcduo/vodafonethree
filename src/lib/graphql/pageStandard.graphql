@@ -1,0 +1,58 @@
+fragment ComponentBannerFields on ComponentBanner {
+  __typename
+  sys {
+    id
+  }
+  headline
+  subheadline
+  image {
+    ...ImageFields
+  }
+  ctaText
+  ctaUrl
+}
+
+fragment ComponentInfoBlockFields on ComponentInfoBlock {
+  __typename
+  sys {
+    id
+  }
+  heading
+  body
+  icon {
+    ...ImageFields
+  }
+}
+
+fragment PageStandardFields on PageStandard {
+  __typename
+  sys {
+    id
+    spaceId
+  }
+  internalName
+  title
+  slug
+  bannerPrimary {
+    ...ComponentBannerFields
+  }
+  bannerSecondary {
+    ...ComponentBannerFields
+  }
+  infoBlocksCollection(limit: 20) {
+    items {
+      ...ComponentInfoBlockFields
+    }
+  }
+  seoFields {
+    ...SeoFields
+  }
+}
+
+query pageStandard($slug: String!, $locale: String, $preview: Boolean) {
+  pageStandardCollection(limit: 1, where: { slug: $slug }, locale: $locale, preview: $preview) {
+    items {
+      ...PageStandardFields
+    }
+  }
+}
