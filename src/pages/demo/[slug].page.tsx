@@ -20,7 +20,11 @@ type DemoBattenburg = {
   heading?: string;
   body?: string;
   image?: DemoImage;
-  damAsset?: Record<string, unknown>;
+  damAsset?: {
+    deliveryUrl?: string;
+    title?: string;
+    name?: string;
+  };
 };
 
 type DemoPage = {
@@ -108,7 +112,14 @@ const DemoPageRoute = (
 
         <Stack spacing={10}>
           {sections.map(section => {
-            const imageUrl = section.image?.desktopImageUrl;
+            const imageUrl =
+              section.damAsset?.deliveryUrl || section.image?.desktopImageUrl;
+
+            const imageAlt =
+              section.damAsset?.title ||
+              section.damAsset?.name ||
+              section.image?.internalName ||
+              '';
 
             return (
               <Box
@@ -131,7 +142,7 @@ const DemoPageRoute = (
                     >
                       <Image
                         src={imageUrl}
-                        alt={section.image?.internalName || ''}
+                        alt={imageAlt}
                         width="100%"
                         height="100%"
                         minH={{ base: '280px', md: '420px' }}
