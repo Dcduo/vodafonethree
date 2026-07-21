@@ -23,8 +23,7 @@ fragment DemoBattenburgFields on DemoBattenburg {
   }
   internalName
   heading
-body
-``
+  body
   image {
     ...DemoImageFields
   }
@@ -46,10 +45,14 @@ fragment DemoPageFields on DemoPage {
 }
 
 query demoPage($slug: String!, $locale: String, $preview: Boolean) {
-  demoPageCollection(limit: 1, where: { slug: $slug }, locale: $locale, preview: $preview) {
+  demoPageCollection(
+    limit: 1
+    where: { slug: $slug }
+    locale: $locale
+    preview: $preview
+  ) {
     items {
       ...DemoPageFields
     }
   }
 }
-``
