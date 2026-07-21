@@ -123,13 +123,32 @@ const DemoPageRoute = (
                   spacing={0}
                   align="stretch"
                 >
-                  {imageUrl && (
+                  {imageUrl ? (
                     <Box
                       flex="1"
                       minH={{ base: '280px', md: '420px' }}
                       bg="gray.50"
                     >
-                      {imageUrl}
+                      <Image
+                        src={imageUrl}
+                        alt={section.image?.internalName || ''}
+                        width="100%"
+                        height="100%"
+                        minH={{ base: '280px', md: '420px' }}
+                        objectFit="cover"
+                      />
+                    </Box>
+                  ) : (
+                    <Box
+                      flex="1"
+                      minH={{ base: '280px', md: '420px' }}
+                      bg="gray.50"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      p={6}
+                    >
+                      <Text color="gray.500">No image URL has been added.</Text>
                     </Box>
                   )}
 
