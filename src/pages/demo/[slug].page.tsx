@@ -184,13 +184,12 @@ export const getServerSideProps: GetServerSideProps = async ({
         page,
       },
     };
-  } catch (error) {
-    console.error('Unable to load the DAM demo page:', error);
+  
+} catch (error) {
+  console.error('Unable to load the DAM demo page:', error);
 
-    return {
-      notFound: true,
-    };
-  }
+  throw error;
+}
 };
 
 export default DemoPageRoute;
