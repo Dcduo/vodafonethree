@@ -78,7 +78,6 @@ const DEMO_PAGE_QUERY = `
                 }
                 internalName
                 desktopImageUrl
-                altText
               }
             }
           }
