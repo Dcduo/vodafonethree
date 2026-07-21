@@ -23,9 +23,8 @@ fragment DemoBattenburgFields on DemoBattenburg {
   }
   internalName
   heading
-  body {
-    json
-  }
+body
+``
   image {
     ...DemoImageFields
   }
