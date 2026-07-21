@@ -10,7 +10,6 @@ type DemoImage = {
   };
   internalName?: string;
   desktopImageUrl?: string;
-  altText?: string;
 };
 
 type DemoBattenburg = {
@@ -125,14 +124,12 @@ const DemoPageRoute = (
                   align="stretch"
                 >
                   {imageUrl && (
-                    
-  <Box flex="1" bg="gray.50">
-    <Image
-      src={imageUrl}
-      alt={section.image?.internalName || ''}
-      width="100%"
-      height="
-
+                    <Box
+                      flex="1"
+                      minH={{ base: '280px', md: '420px' }}
+                      bg="gray.50"
+                    >
+                      {imageUrl}
                     </Box>
                   )}
 
