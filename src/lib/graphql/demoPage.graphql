@@ -1,0 +1,56 @@
+fragment DemoImageFields on DemoImage {
+  __typename
+  sys {
+    id
+  }
+  internalName
+  desktopImageUrl
+  desktopRetinaImageUrl
+  tabletImageUrl
+  tabletRetinaImageUrl
+  mobileImageUrl
+  mobileRetinaImageUrl
+  smallMobileImageUrl
+  landscapeImageUrl
+  fallbackImageUrl
+  altText
+}
+
+fragment DemoBattenburgFields on DemoBattenburg {
+  __typename
+  sys {
+    id
+  }
+  internalName
+  heading
+  body {
+    json
+  }
+  image {
+    ...DemoImageFields
+  }
+  damAsset
+}
+
+fragment DemoPageFields on DemoPage {
+  __typename
+  sys {
+    id
+  }
+  internalName
+  slug
+  sectionsCollection(limit: 20) {
+    items {
+      ...DemoBattenburgFields
+    }
+  }
+}
+
+query demoPage($slug: String!, $locale: String, $preview: Boolean) {
+  demoPageCollection(limit: 1, where: { slug: $slug }, locale: $locale, preview: $preview) {
+    items {
+      ...DemoPageFields
+    }
+  }
+}
+``
