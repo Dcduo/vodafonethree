@@ -41,6 +41,12 @@ type DemoPageQueryResponse = {
   };
 };
 
+type GraphQlRequestError = {
+  response?: {
+    errors?: unknown;
+  };
+};
+
 const DEMO_PAGE_QUERY = `
   query DemoPage($slug: String!, $locale: String, $preview: Boolean) {
     demoPageCollection(
@@ -184,17 +190,16 @@ export const getServerSideProps: GetServerSideProps = async ({
         page,
       },
     };
-  
+  } catch (error) {
+    const graphQlError = error as GraphQlRequestError;
 
-} catch (error) {
-  console.error(
-    'Unable to load the DAM demo page:',
-    JSON.stringify(error, null, 2),
-  );
+    console.error(
+      'CONTENTFUL GRAPHQL ERRORS:',
+      JSON.stringify(graphQlError.response?.errors, null, 2),
+    );
 
-  throw error;
-}
-
+    throw error;
+  }
 };
 
 export default DemoPageRoute;
