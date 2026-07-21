@@ -90,6 +90,9 @@ const DEMO_PAGE_QUERY = `
   }
 `;
 
+const addWidthModifier = (url: string, width: number) =>
+  `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
+
 const DemoPageRoute = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) => {
@@ -121,6 +124,16 @@ const DemoPageRoute = (
               section.image?.internalName ||
               '';
 
+            const responsiveImage = Boolean(
+              section.damAsset?.deliveryUrl,
+            );
+
+            const responsiveSrcSet = responsiveImage && imageUrl
+              ? [480, 768, 1200, 1600]
+                  .map(width => `${addWidthModifier(imageUrl, width)} ${width}w`)
+                  .join(', ')
+              : undefined;
+
             return (
               <Box
                 key={section.sys.id}
@@ -141,7 +154,17 @@ const DemoPageRoute = (
                       bg="gray.50"
                     >
                       <Image
-                        src={imageUrl}
+                        src={
+                          responsiveImage
+                            ? addWidthModifier(imageUrl, 1200)
+                            : imageUrl
+                        }
+                        srcSet={responsiveSrcSet}
+                        sizes={
+                          responsiveImage
+                            ? '(max-width: 767px) 100vw, 50vw'
+                            : undefined
+                        }
                         alt={imageAlt}
                         width="100%"
                         height="100%"
@@ -176,7 +199,9 @@ const DemoPageRoute = (
                     {section.body && <Text>{section.body}</Text>}
 
                     <Text color="gray.500" fontSize="sm">
-                      Image delivered directly from Adobe Dynamic Media
+                      {responsiveImage
+                        ? 'One DAM asset; responsive 480, 768, 1200 and 1600px renditions generated on demand.'
+                        : 'Legacy Contentful image fallback.'}
                     </Text>
                   </Stack>
                 </Stack>
