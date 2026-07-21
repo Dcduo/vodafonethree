@@ -125,8 +125,14 @@ const DemoPageRoute = (
                   align="stretch"
                 >
                   {imageUrl && (
-                    <Box flex="1" bg="gray.50">
-                      {imageUrl}
+                    
+  <Box flex="1" bg="gray.50">
+    <Image
+      src={imageUrl}
+      alt={section.image?.internalName || ''}
+      width="100%"
+      height="
+
                     </Box>
                   )}
 
