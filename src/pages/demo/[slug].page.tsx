@@ -24,6 +24,7 @@ type DemoBattenburg = {
     deliveryUrl?: string;
     title?: string;
     name?: string;
+    altText?: string;
   };
 };
 
@@ -118,11 +119,9 @@ const DemoPageRoute = (
             const imageUrl =
               section.damAsset?.deliveryUrl || section.image?.desktopImageUrl;
 
-            const imageAlt =
-              section.damAsset?.title ||
-              section.damAsset?.name ||
-              section.image?.internalName ||
-              '';
+            const imageAlt = section.damAsset?.deliveryUrl
+              ? section.damAsset.altText || ''
+              : section.image?.internalName || '';
 
             const responsiveImage = Boolean(
               section.damAsset?.deliveryUrl,
