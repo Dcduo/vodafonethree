@@ -18,7 +18,6 @@ type DamAsset = {
   name?: string;
   altText?: string;
   decorative?: boolean;
-  mobileOverride?: DamAsset | null;
 };
 
 type DemoBattenburg = {
@@ -137,17 +136,7 @@ const DemoPageRoute = (
                   .join(', ')
               : undefined;
 
-            const mobileOverrideUrl =
-              section.damAsset?.mobileOverride?.deliveryUrl;
 
-            const mobileOverrideSrcSet = mobileOverrideUrl
-              ? [320, 480, 768]
-                  .map(
-                    width =>
-                      `${addWidthModifier(mobileOverrideUrl, width)} ${width}w`,
-                  )
-                  .join(', ')
-              : undefined;
 
             return (
               <Box
@@ -168,34 +157,24 @@ const DemoPageRoute = (
                       minH={{ base: '280px', md: '420px' }}
                       bg="gray.50"
                     >
-                      <picture>
-                        {mobileOverrideUrl && (
-                          <source
-                            media="(max-width: 767px)"
-                            srcSet={mobileOverrideSrcSet}
-                            sizes="100vw"
-                          />
-                        )}
-
-                        <Image
-                          src={
-                            responsiveImage
-                              ? addWidthModifier(imageUrl, 1200)
-                              : imageUrl
-                          }
-                          srcSet={responsiveSrcSet}
-                          sizes={
-                            responsiveImage
-                              ? '(max-width: 767px) 100vw, 50vw'
-                              : undefined
-                          }
-                          alt={imageAlt}
-                          width="100%"
-                          height="100%"
-                          minH={{ base: '280px', md: '420px' }}
-                          objectFit="cover"
-                        />
-                      </picture>
+                      <Image
+                        src={
+                          responsiveImage
+                            ? addWidthModifier(imageUrl, 1200)
+                            : imageUrl
+                        }
+                        srcSet={responsiveSrcSet}
+                        sizes={
+                          responsiveImage
+                            ? '(max-width: 767px) 100vw, 50vw'
+                            : undefined
+                        }
+                        alt={imageAlt}
+                        width="100%"
+                        height="100%"
+                        minH={{ base: '280px', md: '420px' }}
+                        objectFit="cover"
+                      />
                     </Box>
                   ) : (
                     <Box
@@ -225,9 +204,7 @@ const DemoPageRoute = (
 
                     <Text color="gray.500" fontSize="sm">
                       {responsiveImage
-                        ? mobileOverrideUrl
-                          ? 'Primary DAM asset plus an optional mobile art-direction override.'
-                          : 'One DAM asset; responsive 480, 768, 1200 and 1600px renditions generated on demand.'
+                        ? 'One DAM asset; responsive 480, 768, 1200 and 1600px renditions generated on demand. Smart Crop can be added once profiles exist.'
                         : 'Legacy Contentful image fallback.'}
                     </Text>
                   </Stack>
