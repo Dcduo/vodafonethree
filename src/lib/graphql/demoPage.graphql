@@ -1,21 +1,3 @@
-fragment DemoImageFields on DemoImage {
-  __typename
-  sys {
-    id
-  }
-  internalName
-  desktopImageUrl
-  desktopRetinaImageUrl
-  tabletImageUrl
-  tabletRetinaImageUrl
-  mobileImageUrl
-  mobileRetinaImageUrl
-  smallMobileImageUrl
-  landscapeImageUrl
-  fallbackImageUrl
-  altText
-}
-
 fragment DemoBattenburgFields on DemoBattenburg {
   __typename
   sys {
@@ -24,8 +6,13 @@ fragment DemoBattenburgFields on DemoBattenburg {
   internalName
   heading
   body
-  image {
-    ...DemoImageFields
+  imgbat {
+    sys {
+      id
+    }
+    url
+    title
+    description
   }
 }
 
