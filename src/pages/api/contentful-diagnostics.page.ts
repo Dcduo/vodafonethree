@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { graphQlClient } from '@src/lib/client';
+import { graphQlClient, previewGraphQlClient } from '@src/lib/client';
 
 type DiagnosticEntry = {
   id: string;
@@ -16,16 +16,25 @@ type SlugMatch = {
   slug?: string | null;
 };
 
+type SectionRef = {
+  typename: string;
+  id: string;
+};
+
 type DiagnosticResponse = {
   ok: boolean;
   environment: string;
   spaceConfigured: boolean;
   accessTokenConfigured: boolean;
+  previewAccessTokenConfigured: boolean;
   slug?: string;
   entryFound?: boolean;
   entry?: DiagnosticEntry | null;
   candidateCollections?: string[];
   matches?: SlugMatch[];
+  publishedSections?: SectionRef[];
+  previewSections?: SectionRef[];
+  previewError?: string;
   error?: string;
 };
 
@@ -36,6 +45,22 @@ type MinimalPageQueryResponse = {
       internalName?: string | null;
       title?: string | null;
       slug?: string | null;
+    } | null>;
+  } | null;
+};
+
+type DemoSectionsQueryResponse = {
+  demoPageCollection?: {
+    items: Array<{
+      sys: { id: string };
+      internalName?: string | null;
+      slug?: string | null;
+      sectionsCollection?: {
+        items: Array<{
+          __typename: string;
+          sys: { id: string };
+        } | null>;
+      } | null;
     } | null>;
   } | null;
 };
@@ -87,6 +112,28 @@ const PAGE_STANDARD_QUERY = `
         internalName
         title
         slug
+      }
+    }
+  }
+`;
+
+const DEMO_SECTIONS_QUERY = `
+  query DiagnosticDemoSections($slug: String!, $preview: Boolean) {
+    demoPageCollection(limit: 1, where: { slug: $slug }, preview: $preview) {
+      items {
+        sys {
+          id
+        }
+        internalName
+        slug
+        sectionsCollection(limit: 50) {
+          items {
+            __typename
+            sys {
+              id
+            }
+          }
+        }
       }
     }
   }
@@ -225,16 +272,34 @@ const searchSlugAcrossCollections = async (
   });
 };
 
+const sectionRefs = (data: DemoSectionsQueryResponse): SectionRef[] => {
+  const sections = data.demoPageCollection?.items[0]?.sectionsCollection?.items ?? [];
+
+  return sections.flatMap(section =>
+    section
+      ? [{
+          typename: section.__typename,
+          id: section.sys.id,
+        }]
+      : [],
+  );
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<DiagnosticResponse>,
 ) {
+  const base = {
+    environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
+    spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
+    accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
+    previewAccessTokenConfigured: Boolean(process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN),
+  };
+
   if (!isDeployPreviewRequest(req)) {
     res.status(404).json({
       ok: false,
-      environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
-      spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
-      accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
+      ...base,
       error: 'Diagnostics are only available on deploy previews.',
     });
     return;
@@ -245,9 +310,7 @@ export default async function handler(
   if (!slug) {
     res.status(400).json({
       ok: false,
-      environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
-      spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
-      accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
+      ...base,
       error: 'A slug query parameter is required.',
     });
     return;
@@ -264,11 +327,33 @@ export default async function handler(
       ? []
       : await searchSlugAcrossCollections(slug, candidateCollections);
 
+    let publishedSections: SectionRef[] = [];
+    let previewSections: SectionRef[] = [];
+    let previewError: string | undefined;
+
+    if (matches.some(match => match.typename === 'DemoPage')) {
+      const publishedData = await graphQlClient.request<DemoSectionsQueryResponse>(
+        DEMO_SECTIONS_QUERY,
+        { slug, preview: false },
+      );
+      publishedSections = sectionRefs(publishedData);
+
+      if (process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN) {
+        try {
+          const previewData = await previewGraphQlClient.request<DemoSectionsQueryResponse>(
+            DEMO_SECTIONS_QUERY,
+            { slug, preview: true },
+          );
+          previewSections = sectionRefs(previewData);
+        } catch (error) {
+          previewError = safeErrorMessage(error);
+        }
+      }
+    }
+
     res.status(200).json({
       ok: true,
-      environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
-      spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
-      accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
+      ...base,
       slug,
       entryFound: Boolean(entry) || matches.length > 0,
       entry: entry
@@ -281,13 +366,14 @@ export default async function handler(
         : null,
       candidateCollections,
       matches,
+      publishedSections,
+      previewSections,
+      previewError,
     });
   } catch (error) {
     res.status(500).json({
       ok: false,
-      environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
-      spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
-      accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
+      ...base,
       slug,
       error: safeErrorMessage(error),
     });
