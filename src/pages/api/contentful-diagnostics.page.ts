@@ -98,7 +98,14 @@ export default async function handler(
       accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
       slug,
       entryFound: Boolean(entry),
-      entry,
+      entry: entry
+        ? {
+            id: entry.sys.id,
+            internalName: entry.internalName,
+            title: entry.title,
+            slug: entry.slug,
+          }
+        : null,
     });
   } catch (error) {
     res.status(500).json({
