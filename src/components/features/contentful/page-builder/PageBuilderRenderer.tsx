@@ -1,4 +1,3 @@
-import { Box, Container, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
 import { FeatureBanner } from './FeatureBanner';
@@ -9,10 +8,9 @@ import { PageBuilderBlock } from './types';
 
 type Props = {
   blocks: Array<PageBuilderBlock | null>;
-  showUnknownBlocks?: boolean;
 };
 
-export const PageBuilderRenderer = ({ blocks, showUnknownBlocks = false }: Props) => {
+export const PageBuilderRenderer = ({ blocks }: Props) => {
   const renderBlock = (block: PageBuilderBlock): ReactNode => {
     switch (block.__typename) {
       case 'DemoFeatureBanner':
@@ -37,15 +35,7 @@ export const PageBuilderRenderer = ({ blocks, showUnknownBlocks = false }: Props
       }
 
       default:
-        if (!showUnknownBlocks) return null;
-
-        return (
-          <Container key={block.sys.id} maxW="1200px" py={4}>
-            <Box borderWidth="1px" borderRadius="lg" p={4}>
-              <Text color="gray.500">Unsupported page-builder block: {block.__typename}</Text>
-            </Box>
-          </Container>
-        );
+        return null;
     }
   };
 
