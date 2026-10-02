@@ -21,6 +21,11 @@ type SectionRef = {
   id: string;
 };
 
+type TypeField = {
+  name: string;
+  type: string;
+};
+
 type DiagnosticResponse = {
   ok: boolean;
   environment: string;
@@ -34,6 +39,8 @@ type DiagnosticResponse = {
   matches?: SlugMatch[];
   publishedSections?: SectionRef[];
   previewSections?: SectionRef[];
+  demoBattenburgFields?: TypeField[];
+  demoImageFields?: TypeField[];
   previewError?: string;
   error?: string;
 };
@@ -91,6 +98,43 @@ type IntrospectionResponse = {
   };
 };
 
+type ContentTypeIntrospectionResponse = {
+  demoBattenburg?: {
+    fields?: Array<{
+      name: string;
+      type: {
+        kind: string;
+        name?: string | null;
+        ofType?: {
+          kind: string;
+          name?: string | null;
+          ofType?: {
+            kind: string;
+            name?: string | null;
+          } | null;
+        } | null;
+      };
+    }> | null;
+  } | null;
+  demoImage?: {
+    fields?: Array<{
+      name: string;
+      type: {
+        kind: string;
+        name?: string | null;
+        ofType?: {
+          kind: string;
+          name?: string | null;
+          ofType?: {
+            kind: string;
+            name?: string | null;
+          } | null;
+        } | null;
+      };
+    }> | null;
+  } | null;
+};
+
 type DynamicSearchResponse = Record<
   string,
   {
@@ -131,6 +175,45 @@ const DEMO_SECTIONS_QUERY = `
             __typename
             sys {
               id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CONTENT_TYPE_INTROSPECTION_QUERY = `
+  query DiagnosticContentTypes {
+    demoBattenburg: __type(name: "DemoBattenburg") {
+      fields {
+        name
+        type {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
+            }
+          }
+        }
+      }
+    }
+    demoImage: __type(name: "DemoImage") {
+      fields {
+        name
+        type {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
             }
           }
         }
@@ -272,6 +355,34 @@ const searchSlugAcrossCollections = async (
   });
 };
 
+const typeName = (type: {
+  kind: string;
+  name?: string | null;
+  ofType?: {
+    kind: string;
+    name?: string | null;
+    ofType?: {
+      kind: string;
+      name?: string | null;
+    } | null;
+  } | null;
+}): string => {
+  if (type.name) return type.name;
+  if (type.ofType?.name) return `${type.kind}<${type.ofType.name}>`;
+  if (type.ofType?.ofType?.name) {
+    return `${type.kind}<${type.ofType.kind}<${type.ofType.ofType.name}>>`;
+  }
+  return type.kind;
+};
+
+const fieldList = (
+  type: ContentTypeIntrospectionResponse['demoBattenburg'],
+): TypeField[] =>
+  (type?.fields ?? []).map(field => ({
+    name: field.name,
+    type: typeName(field.type),
+  }));
+
 const sectionRefs = (data: DemoSectionsQueryResponse): SectionRef[] => {
   const sections = data.demoPageCollection?.items[0]?.sectionsCollection?.items ?? [];
 
@@ -330,8 +441,15 @@ export default async function handler(
     let publishedSections: SectionRef[] = [];
     let previewSections: SectionRef[] = [];
     let previewError: string | undefined;
+    let demoBattenburgFields: TypeField[] = [];
+    let demoImageFields: TypeField[] = [];
 
     if (matches.some(match => match.typename === 'DemoPage')) {
+      const typeData = await graphQlClient.request<ContentTypeIntrospectionResponse>(
+        CONTENT_TYPE_INTROSPECTION_QUERY,
+      );
+      demoBattenburgFields = fieldList(typeData.demoBattenburg);
+      demoImageFields = fieldList(typeData.demoImage);
       const publishedData = await graphQlClient.request<DemoSectionsQueryResponse>(
         DEMO_SECTIONS_QUERY,
         { slug, preview: false },
@@ -368,6 +486,8 @@ export default async function handler(
       matches,
       publishedSections,
       previewSections,
+      demoBattenburgFields,
+      demoImageFields,
       previewError,
     });
   } catch (error) {
