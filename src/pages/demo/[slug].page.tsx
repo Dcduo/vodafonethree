@@ -39,13 +39,13 @@ type DemoPage = {
   slug: string;
   sectionsCollection?: {
     items: Array<DemoBattenburg | null>;
-  };
+  } | null;
 };
 
 type DemoPageQueryResponse = {
   demoPageCollection?: {
     items: Array<DemoPage | null>;
-  };
+  } | null;
 };
 
 type GraphQlRequestError = {
@@ -94,6 +94,25 @@ const DEMO_PAGE_QUERY = `
   }
 `;
 
+const MINIMAL_DEMO_PAGE_QUERY = `
+  query MinimalDemoPage($slug: String!, $locale: String, $preview: Boolean) {
+    demoPageCollection(
+      limit: 1
+      where: { slug: $slug }
+      locale: $locale
+      preview: $preview
+    ) {
+      items {
+        sys {
+          id
+        }
+        internalName
+        slug
+      }
+    }
+  }
+`;
+
 const addWidthModifier = (url: string, width: number) =>
   `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
 
@@ -117,6 +136,13 @@ const DemoPageRoute = (
           {page.internalName || 'Demo page'}
         </Heading>
 
+        {sections.length === 0 && (
+          <Text color="gray.600">
+            This DemoPage is published and available from Contentful, but its section content could
+            not be loaded with the legacy DAM prototype query.
+          </Text>
+        )}
+
         <Stack spacing={10}>
           {sections.map(section => {
             const imageUrl =
@@ -135,8 +161,6 @@ const DemoPageRoute = (
                   .map(width => `${addWidthModifier(imageUrl, width)} ${width}w`)
                   .join(', ')
               : undefined;
-
-
 
             return (
               <Box
@@ -227,19 +251,31 @@ export const getServerSideProps: GetServerSideProps = async ({
     return { notFound: true };
   }
 
+  const slug = params.slug;
   const gqlClient = preview ? previewGraphQlClient : graphQlClient;
 
-  try {
+  const loadPage = async (
+    query: string,
+    requestedLocale?: string,
+  ): Promise<DemoPage | null> => {
     const data = await gqlClient.request<DemoPageQueryResponse>(
-      DEMO_PAGE_QUERY,
+      query,
       {
-        slug: params.slug,
-        locale,
+        slug,
+        locale: requestedLocale,
         preview: Boolean(preview),
       },
     );
 
-    const page = data.demoPageCollection?.items[0];
+    return data.demoPageCollection?.items[0] ?? null;
+  };
+
+  try {
+    let page = await loadPage(DEMO_PAGE_QUERY, locale);
+
+    if (!page && locale) {
+      page = await loadPage(DEMO_PAGE_QUERY);
+    }
 
     if (!page) {
       return { notFound: true };
@@ -255,11 +291,37 @@ export const getServerSideProps: GetServerSideProps = async ({
     const graphQlError = error as GraphQlRequestError;
 
     console.error(
-      'CONTENTFUL GRAPHQL ERRORS:',
+      'Rich DemoPage query failed; retrying minimal fields:',
       JSON.stringify(graphQlError.response?.errors, null, 2),
     );
 
-    throw error;
+    try {
+      let page = await loadPage(MINIMAL_DEMO_PAGE_QUERY, locale);
+
+      if (!page && locale) {
+        page = await loadPage(MINIMAL_DEMO_PAGE_QUERY);
+      }
+
+      if (!page) {
+        return { notFound: true };
+      }
+
+      return {
+        props: {
+          ...(await getServerSideTranslations(locale)),
+          page,
+        },
+      };
+    } catch (minimalError) {
+      const minimalGraphQlError = minimalError as GraphQlRequestError;
+
+      console.error(
+        'Minimal DemoPage query also failed:',
+        JSON.stringify(minimalGraphQlError.response?.errors, null, 2),
+      );
+
+      throw minimalError;
+    }
   }
 };
 
