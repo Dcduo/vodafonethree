@@ -4,12 +4,13 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { graphQlClient, previewGraphQlClient } from '@src/lib/client';
 import { getServerSideTranslations } from '@src/pages/utils/get-serverside-translations';
 
-type DemoImage = {
+type ContentfulAsset = {
   sys: {
     id: string;
   };
-  internalName?: string;
-  desktopImageUrl?: string;
+  url?: string | null;
+  title?: string | null;
+  description?: string | null;
 };
 
 type DemoBattenburg = {
@@ -19,7 +20,7 @@ type DemoBattenburg = {
   internalName?: string;
   heading?: string;
   body?: string;
-  image?: DemoImage;
+  imgbat?: ContentfulAsset | null;
 };
 
 type DemoPage = {
@@ -69,12 +70,13 @@ const DEMO_PAGE_QUERY = `
               internalName
               heading
               body
-              image {
+              imgbat {
                 sys {
                   id
                 }
-                internalName
-                desktopImageUrl
+                url
+                title
+                description
               }
             }
           }
@@ -132,7 +134,13 @@ const DemoPageRoute = (
 
         <Stack spacing={10}>
           {sections.map(section => {
-            const imageUrl = section.image?.desktopImageUrl;
+            const imageUrl = section.imgbat?.url;
+            const imageAlt =
+              section.imgbat?.description ||
+              section.imgbat?.title ||
+              section.heading ||
+              section.internalName ||
+              '';
 
             return (
               <Box
@@ -155,7 +163,7 @@ const DemoPageRoute = (
                     >
                       <Image
                         src={imageUrl}
-                        alt={section.image?.internalName || ''}
+                        alt={imageAlt}
                         width="100%"
                         height="100%"
                         minH={{ base: '280px', md: '420px' }}
