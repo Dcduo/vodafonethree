@@ -57,11 +57,27 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale, p
     return { notFound: true };
   }
 
+  const slug = params.slug;
   const gqlClient = preview ? previewClient : client;
 
   try {
-    const data = await gqlClient.pageStandard({ slug: params.slug, locale, preview });
-    const page = data.pageStandardCollection?.items[0];
+    const loadPage = async (requestedLocale?: string) => {
+      const data = await gqlClient.pageStandard({
+        slug,
+        locale: requestedLocale,
+        preview,
+      });
+
+      return data.pageStandardCollection?.items[0] ?? null;
+    };
+
+    let page = await loadPage(locale);
+
+    // A Writer-created entry may only have values in the Contentful default
+    // locale. Retry without forcing the Next.js locale before returning 404.
+    if (!page && locale) {
+      page = await loadPage();
+    }
 
     if (!page) {
       return { notFound: true };
@@ -73,8 +89,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale, p
         page,
       },
     };
-  } catch {
-    return { notFound: true };
+  } catch (error) {
+    console.error('Unable to load standard Contentful page:', {
+      slug,
+      locale,
+      preview: Boolean(preview),
+      error,
+    });
+
+    throw error;
   }
 };
 
