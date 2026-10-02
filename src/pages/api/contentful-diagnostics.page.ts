@@ -59,11 +59,25 @@ const safeErrorMessage = (error: unknown): string => {
   return error instanceof Error ? error.message : 'Unknown Contentful error';
 };
 
+const isDeployPreviewRequest = (req: NextApiRequest): boolean => {
+  if (process.env.CONTEXT === 'deploy-preview') {
+    return true;
+  }
+
+  const host = (req.headers.host || '').toLowerCase();
+
+  return (
+    host.startsWith('deploy-preview-') &&
+    host.includes('--') &&
+    host.endsWith('.netlify.app')
+  );
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<DiagnosticResponse>,
 ) {
-  if (process.env.CONTEXT !== 'deploy-preview') {
+  if (!isDeployPreviewRequest(req)) {
     res.status(404).json({
       ok: false,
       environment: process.env.CONTENTFUL_ENVIRONMENT || 'default/master',
