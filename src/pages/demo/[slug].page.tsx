@@ -12,14 +12,6 @@ type DemoImage = {
   desktopImageUrl?: string;
 };
 
-type DamAsset = {
-  deliveryUrl?: string;
-  title?: string;
-  name?: string;
-  altText?: string;
-  decorative?: boolean;
-};
-
 type DemoBattenburg = {
   sys: {
     id: string;
@@ -28,7 +20,6 @@ type DemoBattenburg = {
   heading?: string;
   body?: string;
   image?: DemoImage;
-  damAsset?: DamAsset;
 };
 
 type DemoPage = {
@@ -39,13 +30,13 @@ type DemoPage = {
   slug: string;
   sectionsCollection?: {
     items: Array<DemoBattenburg | null>;
-  };
+  } | null;
 };
 
 type DemoPageQueryResponse = {
   demoPageCollection?: {
     items: Array<DemoPage | null>;
-  };
+  } | null;
 };
 
 type GraphQlRequestError = {
@@ -78,7 +69,6 @@ const DEMO_PAGE_QUERY = `
               internalName
               heading
               body
-              damAsset
               image {
                 sys {
                   id
@@ -94,8 +84,24 @@ const DEMO_PAGE_QUERY = `
   }
 `;
 
-const addWidthModifier = (url: string, width: number) =>
-  `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
+const MINIMAL_DEMO_PAGE_QUERY = `
+  query MinimalDemoPage($slug: String!, $locale: String, $preview: Boolean) {
+    demoPageCollection(
+      limit: 1
+      where: { slug: $slug }
+      locale: $locale
+      preview: $preview
+    ) {
+      items {
+        sys {
+          id
+        }
+        internalName
+        slug
+      }
+    }
+  }
+`;
 
 const DemoPageRoute = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
@@ -110,33 +116,23 @@ const DemoPageRoute = (
     <Box py={{ base: 8, md: 12 }}>
       <Container maxW="1200px">
         <Text mb={2} color="gray.500" fontSize="sm">
-          DAM connector prototype
+          Contentful demo page
         </Text>
 
         <Heading as="h1" mb={8}>
           {page.internalName || 'Demo page'}
         </Heading>
 
+        {sections.length === 0 && (
+          <Text color="gray.600">
+            This DemoPage is published, but it does not currently have any renderable published
+            sections.
+          </Text>
+        )}
+
         <Stack spacing={10}>
           {sections.map(section => {
-            const imageUrl =
-              section.damAsset?.deliveryUrl || section.image?.desktopImageUrl;
-
-            const imageAlt = section.damAsset?.deliveryUrl
-              ? section.damAsset.altText || ''
-              : section.image?.internalName || '';
-
-            const responsiveImage = Boolean(
-              section.damAsset?.deliveryUrl,
-            );
-
-            const responsiveSrcSet = responsiveImage && imageUrl
-              ? [480, 768, 1200, 1600]
-                  .map(width => `${addWidthModifier(imageUrl, width)} ${width}w`)
-                  .join(', ')
-              : undefined;
-
-
+            const imageUrl = section.image?.desktopImageUrl;
 
             return (
               <Box
@@ -158,18 +154,8 @@ const DemoPageRoute = (
                       bg="gray.50"
                     >
                       <Image
-                        src={
-                          responsiveImage
-                            ? addWidthModifier(imageUrl, 1200)
-                            : imageUrl
-                        }
-                        srcSet={responsiveSrcSet}
-                        sizes={
-                          responsiveImage
-                            ? '(max-width: 767px) 100vw, 50vw'
-                            : undefined
-                        }
-                        alt={imageAlt}
+                        src={imageUrl}
+                        alt={section.image?.internalName || ''}
                         width="100%"
                         height="100%"
                         minH={{ base: '280px', md: '420px' }}
@@ -186,7 +172,7 @@ const DemoPageRoute = (
                       justifyContent="center"
                       p={6}
                     >
-                      <Text color="gray.500">No image URL has been added.</Text>
+                      <Text color="gray.500">No image has been added.</Text>
                     </Box>
                   )}
 
@@ -201,12 +187,6 @@ const DemoPageRoute = (
                     </Heading>
 
                     {section.body && <Text>{section.body}</Text>}
-
-                    <Text color="gray.500" fontSize="sm">
-                      {responsiveImage
-                        ? 'One DAM asset; responsive 480, 768, 1200 and 1600px renditions generated on demand. Smart Crop can be added once profiles exist.'
-                        : 'Legacy Contentful image fallback.'}
-                    </Text>
                   </Stack>
                 </Stack>
               </Box>
@@ -227,19 +207,31 @@ export const getServerSideProps: GetServerSideProps = async ({
     return { notFound: true };
   }
 
+  const slug = params.slug;
   const gqlClient = preview ? previewGraphQlClient : graphQlClient;
 
-  try {
+  const loadPage = async (
+    query: string,
+    requestedLocale?: string,
+  ): Promise<DemoPage | null> => {
     const data = await gqlClient.request<DemoPageQueryResponse>(
-      DEMO_PAGE_QUERY,
+      query,
       {
-        slug: params.slug,
-        locale,
+        slug,
+        locale: requestedLocale,
         preview: Boolean(preview),
       },
     );
 
-    const page = data.demoPageCollection?.items[0];
+    return data.demoPageCollection?.items[0] ?? null;
+  };
+
+  try {
+    let page = await loadPage(DEMO_PAGE_QUERY, locale);
+
+    if (!page && locale) {
+      page = await loadPage(DEMO_PAGE_QUERY);
+    }
 
     if (!page) {
       return { notFound: true };
@@ -255,11 +247,37 @@ export const getServerSideProps: GetServerSideProps = async ({
     const graphQlError = error as GraphQlRequestError;
 
     console.error(
-      'CONTENTFUL GRAPHQL ERRORS:',
+      'Rich DemoPage query failed; retrying minimal fields:',
       JSON.stringify(graphQlError.response?.errors, null, 2),
     );
 
-    throw error;
+    try {
+      let page = await loadPage(MINIMAL_DEMO_PAGE_QUERY, locale);
+
+      if (!page && locale) {
+        page = await loadPage(MINIMAL_DEMO_PAGE_QUERY);
+      }
+
+      if (!page) {
+        return { notFound: true };
+      }
+
+      return {
+        props: {
+          ...(await getServerSideTranslations(locale)),
+          page,
+        },
+      };
+    } catch (minimalError) {
+      const minimalGraphQlError = minimalError as GraphQlRequestError;
+
+      console.error(
+        'Minimal DemoPage query also failed:',
+        JSON.stringify(minimalGraphQlError.response?.errors, null, 2),
+      );
+
+      throw minimalError;
+    }
   }
 };
 

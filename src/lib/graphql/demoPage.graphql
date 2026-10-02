@@ -27,7 +27,6 @@ fragment DemoBattenburgFields on DemoBattenburg {
   image {
     ...DemoImageFields
   }
-  damAsset
 }
 
 fragment DemoPageFields on DemoPage {
