@@ -2,6 +2,20 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { graphQlClient } from '@src/lib/client';
 
+type DiagnosticEntry = {
+  id: string;
+  internalName?: string | null;
+  title?: string | null;
+  slug?: string | null;
+};
+
+type SlugMatch = {
+  collection: string;
+  typename: string;
+  id: string;
+  slug?: string | null;
+};
+
 type DiagnosticResponse = {
   ok: boolean;
   environment: string;
@@ -9,12 +23,9 @@ type DiagnosticResponse = {
   accessTokenConfigured: boolean;
   slug?: string;
   entryFound?: boolean;
-  entry?: {
-    id: string;
-    internalName?: string | null;
-    title?: string | null;
-    slug?: string | null;
-  } | null;
+  entry?: DiagnosticEntry | null;
+  candidateCollections?: string[];
+  matches?: SlugMatch[];
   error?: string;
 };
 
@@ -29,7 +40,44 @@ type MinimalPageQueryResponse = {
   } | null;
 };
 
-const QUERY = `
+type IntrospectionResponse = {
+  __schema: {
+    queryType: {
+      fields: Array<{
+        name: string;
+        args: Array<{
+          name: string;
+          type: {
+            kind: string;
+            name?: string | null;
+            ofType?: {
+              kind: string;
+              name?: string | null;
+            } | null;
+          };
+        }>;
+      }>;
+    };
+    types: Array<{
+      kind: string;
+      name?: string | null;
+      inputFields?: Array<{ name: string }> | null;
+    }>;
+  };
+};
+
+type DynamicSearchResponse = Record<
+  string,
+  {
+    items: Array<{
+      __typename: string;
+      sys: { id: string };
+      slug?: string | null;
+    } | null>;
+  } | null
+>;
+
+const PAGE_STANDARD_QUERY = `
   query DiagnosticPageStandard($slug: String!) {
     pageStandardCollection(limit: 1, where: { slug: $slug }) {
       items {
@@ -39,6 +87,36 @@ const QUERY = `
         internalName
         title
         slug
+      }
+    }
+  }
+`;
+
+const INTROSPECTION_QUERY = `
+  query DiagnosticSchema {
+    __schema {
+      queryType {
+        fields {
+          name
+          args {
+            name
+            type {
+              kind
+              name
+              ofType {
+                kind
+                name
+              }
+            }
+          }
+        }
+      }
+      types {
+        kind
+        name
+        inputFields {
+          name
+        }
       }
     }
   }
@@ -73,6 +151,80 @@ const isDeployPreviewRequest = (req: NextApiRequest): boolean => {
   );
 };
 
+const namedType = (type: {
+  name?: string | null;
+  ofType?: { name?: string | null } | null;
+}): string | null => type.name || type.ofType?.name || null;
+
+const findSlugCollections = async (): Promise<string[]> => {
+  const schema = await graphQlClient.request<IntrospectionResponse>(INTROSPECTION_QUERY);
+
+  const inputTypes = new Map(
+    schema.__schema.types
+      .filter(type => type.kind === 'INPUT_OBJECT' && type.name)
+      .map(type => [type.name as string, type.inputFields?.map(field => field.name) ?? []]),
+  );
+
+  return schema.__schema.queryType.fields
+    .filter(field => field.name.endsWith('Collection'))
+    .filter(field => {
+      const whereArg = field.args.find(arg => arg.name === 'where');
+      if (!whereArg) return false;
+
+      const filterTypeName = namedType(whereArg.type);
+      if (!filterTypeName) return false;
+
+      return inputTypes.get(filterTypeName)?.includes('slug') ?? false;
+    })
+    .map(field => field.name)
+    .sort();
+};
+
+const searchSlugAcrossCollections = async (
+  slug: string,
+  collections: string[],
+): Promise<SlugMatch[]> => {
+  if (!collections.length) return [];
+
+  const selections = collections
+    .map(
+      (collection, index) => `
+        c${index}: ${collection}(limit: 1, where: { slug: $slug }) {
+          items {
+            __typename
+            sys {
+              id
+            }
+            slug
+          }
+        }
+      `,
+    )
+    .join('\n');
+
+  const query = `
+    query DiagnosticSlugSearch($slug: String!) {
+      ${selections}
+    }
+  `;
+
+  const data = await graphQlClient.request<DynamicSearchResponse>(query, { slug });
+
+  return collections.flatMap((collection, index) => {
+    const item = data[`c${index}`]?.items[0];
+    if (!item) return [];
+
+    return [
+      {
+        collection,
+        typename: item.__typename,
+        id: item.sys.id,
+        slug: item.slug,
+      },
+    ];
+  });
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<DiagnosticResponse>,
@@ -102,8 +254,15 @@ export default async function handler(
   }
 
   try {
-    const data = await graphQlClient.request<MinimalPageQueryResponse>(QUERY, { slug });
+    const data = await graphQlClient.request<MinimalPageQueryResponse>(PAGE_STANDARD_QUERY, {
+      slug,
+    });
     const entry = data.pageStandardCollection?.items[0] ?? null;
+
+    const candidateCollections = entry ? [] : await findSlugCollections();
+    const matches = entry
+      ? []
+      : await searchSlugAcrossCollections(slug, candidateCollections);
 
     res.status(200).json({
       ok: true,
@@ -111,7 +270,7 @@ export default async function handler(
       spaceConfigured: Boolean(process.env.CONTENTFUL_SPACE_ID),
       accessTokenConfigured: Boolean(process.env.CONTENTFUL_ACCESS_TOKEN),
       slug,
-      entryFound: Boolean(entry),
+      entryFound: Boolean(entry) || matches.length > 0,
       entry: entry
         ? {
             id: entry.sys.id,
@@ -120,6 +279,8 @@ export default async function handler(
             slug: entry.slug,
           }
         : null,
+      candidateCollections,
+      matches,
     });
   } catch (error) {
     res.status(500).json({
