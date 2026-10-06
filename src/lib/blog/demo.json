@@ -1,0 +1,76 @@
+{
+  "title": "A smarter day out: six ways to get your phone ready",
+  "slug": "smarter-day-out",
+  "publishedDate": "2026-10-07T09:00:00Z",
+  "overview": "A little preparation can make your phone more useful when you head out. Use this simple checklist to organise your plans, keep the essentials close and enjoy the day.",
+  "seoTitle": null,
+  "seoDescription": "A practical checklist for preparing your phone before a day out, from saving tickets to planning your journey.",
+  "sections": [
+    {
+      "id": "demo-section-1",
+      "heading": "Put your plans in one place",
+      "body": "Before you leave, gather the details you will need: meeting points, opening times and booking references. A short note is easier to check than several long message threads.",
+      "instructions": [
+        "**Make a day plan:** Add your destination, meeting time and booking reference to a note."
+      ],
+      "imageUrl": "https://images.vodafone.co.uk/gbnnsauqav4t/3JZ8vSyh1Ct1YCzWGcSF6a/a67cae94b0b4558a345153dab43dd216/using-mobile-in-dark-blog-divider.webp",
+      "imageAlt": "A person using a phone after dark",
+      "callout": null
+    },
+    {
+      "id": "demo-section-2",
+      "heading": "Save the essentials",
+      "body": "Keep a copy of any ticket or booking confirmation somewhere you can find quickly. Check the organiser\u2019s instructions first: some tickets need to stay in the original app.",
+      "instructions": [
+        "**Check your tickets:** Open each booking and follow the provider\u2019s instructions for using it on the day."
+      ],
+      "imageUrl": null,
+      "imageAlt": "",
+      "callout": null
+    },
+    {
+      "id": "demo-section-3",
+      "heading": "Think about your journey",
+      "body": "Decide how you will get there and how you will get home. Share the meeting point with anyone joining you, and leave room in your plan for a change of route.",
+      "instructions": [
+        "**Plan your return:** Write down your preferred route and one alternative."
+      ],
+      "imageUrl": "https://images.vodafone.co.uk/gbnnsauqav4t/1OfQWkuyzrlFtVKK9oW5xt/32a78a0beb99887a683e282709476b14/Woman-using-phone-on-train-brightness-blog-divider.webp",
+      "imageAlt": "A passenger checking a phone on a train",
+      "callout": null
+    },
+    {
+      "id": "demo-section-4",
+      "heading": "Give yourself a charging plan",
+      "body": "Check your battery before setting off. If it will be a long day, put a compatible cable or charged power bank in your bag.",
+      "instructions": [
+        "**Before you leave:** Check your charge and pack the charging accessories you need."
+      ],
+      "imageUrl": null,
+      "imageAlt": "",
+      "callout": null
+    },
+    {
+      "id": "demo-section-5",
+      "heading": "Keep important contacts handy",
+      "body": "Choose a clear way to stay in touch with your group. Agree where to meet if plans change, so everyone knows what to do without searching through old messages.",
+      "instructions": [
+        "**Agree a meeting point:** Save the location and tell the people travelling with you."
+      ],
+      "imageUrl": "https://images.vodafone.co.uk/gbnnsauqav4t/6UGCHvGQGsdwdaM95nSTKY/6d8fff43ae89743c8c65b466e31cee60/changing-setting-phone-blog-divider.webp",
+      "imageAlt": "A close-up of a person using a phone",
+      "callout": null
+    },
+    {
+      "id": "demo-section-6",
+      "heading": "Make time to enjoy the day",
+      "body": "Once the practical details are organised, you can focus on what you came to do. Take the photos you want, put your phone away when it suits you and enjoy the company.",
+      "instructions": [
+        "**Final check:** Tickets, route, charge and contacts \u2014 then you are ready to go."
+      ],
+      "imageUrl": null,
+      "imageAlt": "",
+      "callout": "This is sample content for checking the template. Writer will create a new article from your supplied brief."
+    }
+  ]
+}

@@ -1,0 +1,495 @@
+@font-face {
+  font-family: VodafoneDemo;
+  src: url('https://cdn.vodafone.co.uk/web-marketing/consumer-marketing/assets/1.6.0/theme/ws10/fonts/vodafone-light.woff')
+    format('woff');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: VodafoneDemo;
+  src: url('https://cdn.vodafone.co.uk/web-marketing/consumer-marketing/assets/1.6.0/theme/ws10/fonts/vodafone-regular.woff')
+    format('woff');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: VodafoneDemo;
+  src: url('https://cdn.vodafone.co.uk/web-marketing/consumer-marketing/assets/1.6.0/theme/ws10/fonts/vodafone-bold.woff')
+    format('woff');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+.shell {
+  font-family: VodafoneDemo, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #333;
+  background: #f2f2f2;
+  min-height: 100vh;
+  width: 100%;
+}
+.shell * {
+  box-sizing: border-box;
+}
+.shell a {
+  color: inherit;
+}
+.shell a:hover {
+  text-decoration: underline;
+}
+.shell a:focus-visible,
+.shell button:focus-visible {
+  outline: 3px solid #007c92;
+  outline-offset: 4px;
+}
+.shell h1,
+.shell h2,
+.shell p {
+  margin: 0;
+}
+.shell h1,
+.shell h2 {
+  font-family: inherit;
+}
+.shell strong {
+  font-weight: 700;
+}
+.wide {
+  width: min(1280px, calc(100% - 64px));
+  margin: 0 auto;
+}
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  background: white;
+  padding: 12px;
+}
+.skip:focus {
+  top: 8px;
+}
+.siteHeader {
+  background: white;
+  color: #111;
+}
+.utility {
+  background: #0d0d0d;
+  color: white;
+  font-size: 14px;
+}
+.utility .wide {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+}
+.utility .wide > div {
+  display: flex;
+  gap: 28px;
+}
+.mainNav {
+  width: min(1280px, calc(100% - 64px));
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  min-height: 76px;
+}
+.mainNav > a {
+  flex-shrink: 0;
+}
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 18px;
+  flex: 1;
+}
+.actions {
+  display: flex;
+  gap: 24px;
+  margin-left: auto;
+  align-items: center;
+}
+.actions a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 28px;
+}
+.menuToggle {
+  display: none;
+  border: 0;
+  background: transparent;
+  font-size: 26px;
+  padding: 8px;
+  cursor: pointer;
+}
+.mobileNav {
+  padding: 0 24px 20px;
+}
+.mobileNav a {
+  display: block;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
+}
+.mobileNav[hidden] {
+  display: none;
+}
+.breadcrumb {
+  background: white;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+}
+.breadcrumb > .wide {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 56px;
+  padding-block: 12px;
+}
+.breadcrumb [aria-current] {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.hero {
+  background: linear-gradient(110deg, #a60000, #e60000);
+  color: white;
+  padding: 42px 0 38px;
+}
+.hero h1 {
+  max-width: 780px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.3px;
+}
+.metadata {
+  display: flex;
+  gap: 30px;
+  margin-top: 32px;
+  font-size: 16px;
+  flex-wrap: wrap;
+}
+.metadata > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.metadata > span > span {
+  font-size: 27px;
+  line-height: 1;
+}
+.articleBackground {
+  padding: 32px 0 80px;
+}
+.overview {
+  width: min(1320px, calc(100% - 48px));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 5px #0000000d;
+}
+.overview h2 {
+  font-size: 26px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+.overview p {
+  font-size: 18px;
+  line-height: 1.45;
+}
+.info {
+  border: 2px solid #333;
+  border-radius: 50%;
+  font-family: Georgia, serif;
+  color: #e60000;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+}
+.articleBody {
+  width: min(1056px, calc(100% - 64px));
+  margin: auto;
+}
+.contents {
+  padding: 76px 0 0;
+}
+.contents h2,
+.section h2 {
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1.16;
+  letter-spacing: -0.6px;
+}
+.contents ol {
+  margin: 22px 0 0;
+  padding-left: 32px;
+}
+.contents li {
+  line-height: 1.6;
+}
+.contents a,
+.section a,
+.overview a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.section {
+  margin-top: 76px;
+  scroll-margin-top: 28px;
+}
+.section h2 {
+  margin-bottom: 24px;
+}
+.section p {
+  line-height: 1.5;
+  margin-top: 18px;
+  white-space: pre-line;
+}
+.sectionImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2.9/1;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+.instructions {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+.instructions li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+.instructions li > span {
+  color: #008a00;
+  font-weight: 700;
+}
+.callout {
+  margin-top: 24px;
+  padding: 20px 24px;
+  background: white;
+  border-left: 4px solid #e60000;
+  border-radius: 0 6px 6px 0;
+}
+.preview {
+  padding: 10px 24px;
+  background: #fff3c4;
+  text-align: center;
+  font-size: 16px;
+}
+.preview a {
+  text-decoration: underline;
+}
+.footer {
+  background: #0d0d0d;
+  color: #fff;
+  padding: 24px 0 28px;
+}
+.footerBrand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #666;
+  padding-bottom: 24px;
+}
+.footerBrand img {
+  filter: grayscale(1);
+  width: 36px;
+  height: 36px;
+}
+.socials {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+.footerColumns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding: 28px 0 42px;
+}
+.footerColumns h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.footerColumns ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.footerColumns li {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.legalLinks {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+.legalLinks a + a {
+  border-left: 1px solid #aaa;
+  padding-left: 12px;
+}
+.demoNote {
+  text-align: center;
+  font-size: 13px;
+  color: #ccc;
+  margin-top: 24px !important;
+}
+@media (min-width: 1600px) {
+  .hero {
+    padding-block: 50px;
+  }
+  .hero h1 {
+    font-size: 48px;
+    max-width: 840px;
+  }
+}
+@media (max-width: 1150px) {
+  .desktopNav {
+    gap: 16px;
+    font-size: 16px;
+  }
+  .mainNav {
+    gap: 24px;
+  }
+  .actions {
+    gap: 16px;
+  }
+}
+@media (max-width: 960px) {
+  .desktopNav {
+    display: none;
+  }
+  .menuToggle {
+    display: block;
+  }
+  .mainNav {
+    min-height: 68px;
+  }
+  .hero h1 {
+    font-size: 38px;
+  }
+  .utility .wide > div {
+    gap: 16px;
+  }
+  .contents h2,
+  .section h2 {
+    font-size: 36px;
+  }
+  .footerColumns {
+    gap: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .wide,
+  .mainNav {
+    width: calc(100% - 40px);
+  }
+  .utility .wide > div:last-child {
+    display: none;
+  }
+  .utility .wide {
+    min-height: 28px;
+  }
+  .mainNav {
+    gap: 16px;
+  }
+  .actions {
+    gap: 12px;
+  }
+  .breadcrumb > .wide {
+    gap: 12px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    min-height: 48px;
+  }
+  .hero {
+    padding: 30px 0;
+  }
+  .hero h1 {
+    font-size: 34px;
+  }
+  .metadata {
+    font-size: 15px;
+    margin-top: 24px;
+    gap: 20px;
+  }
+  .articleBackground {
+    padding-top: 20px;
+    padding-bottom: 48px;
+  }
+  .overview {
+    width: calc(100% - 32px);
+    padding: 18px;
+    gap: 16px;
+  }
+  .overview h2 {
+    font-size: 24px;
+  }
+  .overview p {
+    font-size: 17px;
+  }
+  .info {
+    display: none;
+  }
+  .articleBody {
+    width: calc(100% - 40px);
+  }
+  .contents {
+    padding-top: 40px;
+  }
+  .contents h2,
+  .section h2 {
+    font-size: 32px;
+  }
+  .section {
+    margin-top: 48px;
+  }
+  .section h2 {
+    margin-bottom: 18px;
+  }
+  .sectionImage {
+    aspect-ratio: 2/1;
+    border-radius: 10px;
+  }
+  .footerColumns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+  }
+  .footerColumns h2 {
+    font-size: 18px;
+  }
+  .footerColumns li {
+    font-size: 15px;
+  }
+  .socials {
+    gap: 12px;
+    font-size: 12px;
+  }
+  .shell {
+    font-size: 17px;
+  }
+}
