@@ -39,3 +39,6 @@ jobs:
 
       - name: TSC
         run: yarn type-check
+
+      - name: Blog content and setup checks
+        run: node scripts/test-blog.cjs

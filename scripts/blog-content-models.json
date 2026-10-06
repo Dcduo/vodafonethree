@@ -1,0 +1,193 @@
+[
+  {
+    "id": "blogSection",
+    "name": "Blog Section",
+    "description": "Reusable article section for the Writer blog demo.",
+    "displayField": "heading",
+    "fields": [
+      {
+        "id": "heading",
+        "name": "Heading (without a number)",
+        "type": "Symbol",
+        "required": true,
+        "localized": false,
+        "validations": [
+          {
+            "size": {
+              "max": 180
+            }
+          }
+        ]
+      },
+      {
+        "id": "body",
+        "name": "Body",
+        "type": "Text",
+        "required": true,
+        "localized": false
+      },
+      {
+        "id": "instructions",
+        "name": "How-to instructions",
+        "type": "Array",
+        "required": false,
+        "localized": false,
+        "items": {
+          "type": "Symbol"
+        },
+        "validations": [
+          {
+            "size": {
+              "max": 20
+            }
+          }
+        ]
+      },
+      {
+        "id": "image",
+        "name": "Image",
+        "type": "Link",
+        "required": false,
+        "localized": false,
+        "linkType": "Asset",
+        "validations": [
+          {
+            "linkMimetypeGroup": [
+              "image"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "imageUrl",
+        "name": "External image URL (optional)",
+        "type": "Symbol",
+        "required": false,
+        "localized": false,
+        "validations": [
+          {
+            "regexp": {
+              "pattern": "^https://",
+              "flags": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "imageAlt",
+        "name": "Image alternative text",
+        "type": "Symbol",
+        "required": false,
+        "localized": false
+      },
+      {
+        "id": "callout",
+        "name": "Optional callout",
+        "type": "Text",
+        "required": false,
+        "localized": false
+      }
+    ]
+  },
+  {
+    "id": "blogPage",
+    "name": "Blog Page",
+    "description": "Article template with automatic contents, numbering and reading time.",
+    "displayField": "title",
+    "fields": [
+      {
+        "id": "title",
+        "name": "Title",
+        "type": "Symbol",
+        "required": true,
+        "localized": false,
+        "validations": [
+          {
+            "size": {
+              "max": 180
+            }
+          }
+        ]
+      },
+      {
+        "id": "slug",
+        "name": "URL slug",
+        "type": "Symbol",
+        "required": true,
+        "localized": false,
+        "validations": [
+          {
+            "unique": true
+          },
+          {
+            "regexp": {
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "flags": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "publishedDate",
+        "name": "Publication date",
+        "type": "Date",
+        "required": true,
+        "localized": false
+      },
+      {
+        "id": "overview",
+        "name": "Overview",
+        "type": "Text",
+        "required": true,
+        "localized": false
+      },
+      {
+        "id": "sections",
+        "name": "Sections (in display order)",
+        "type": "Array",
+        "required": true,
+        "localized": false,
+        "items": {
+          "type": "Link",
+          "linkType": "Entry",
+          "validations": [
+            {
+              "linkContentType": [
+                "blogSection"
+              ]
+            }
+          ]
+        },
+        "validations": [
+          {
+            "size": {
+              "min": 1,
+              "max": 30
+            }
+          }
+        ]
+      },
+      {
+        "id": "seoTitle",
+        "name": "SEO title",
+        "type": "Symbol",
+        "required": false,
+        "localized": false
+      },
+      {
+        "id": "seoDescription",
+        "name": "SEO description",
+        "type": "Text",
+        "required": false,
+        "localized": false,
+        "validations": [
+          {
+            "size": {
+              "max": 300
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

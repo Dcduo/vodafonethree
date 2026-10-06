@@ -1,0 +1,230 @@
+[
+  {
+    "title": "Buying online",
+    "links": [
+      {
+        "label": "Pay monthly deals",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts"
+      },
+      {
+        "label": "Pay as you go deals",
+        "href": "https://www.vodafone.co.uk/mobile/pay-as-you-go"
+      },
+      {
+        "label": "SIM only deals",
+        "href": "https://www.vodafone.co.uk/sim-only/best-sim-only-deals"
+      },
+      {
+        "label": "iPad",
+        "href": "https://www.vodafone.co.uk/ipad"
+      },
+      {
+        "label": "Tablets",
+        "href": "https://www.vodafone.co.uk/mobile/ipads-and-tablets"
+      },
+      {
+        "label": "Mobile Broadband",
+        "href": "https://www.vodafone.co.uk/mobile-broadband"
+      },
+      {
+        "label": "Home Broadband",
+        "href": "https://www.vodafone.co.uk/broadband"
+      },
+      {
+        "label": "Laptops",
+        "href": "https://www.vodafone.co.uk/mobile/laptops"
+      },
+      {
+        "label": "Vodafone TV",
+        "href": "https://www.vodafone.co.uk/tv"
+      },
+      {
+        "label": "Compare phones",
+        "href": "https://www.vodafone.co.uk/compare"
+      },
+      {
+        "label": "Deals and offers",
+        "href": "https://www.vodafone.co.uk/mobile/deals-and-offers"
+      },
+      {
+        "label": "Vodafone SuperMobile\u2122",
+        "href": "https://www.vodafone.co.uk/vodafone-supermobile"
+      },
+      {
+        "label": "Vodafone Xchange",
+        "href": "https://www.vodafone.co.uk/mobile/xchange"
+      }
+    ]
+  },
+  {
+    "title": "Latest phones",
+    "links": [
+      {
+        "label": "iPhone 18 Pro Max",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/apple/iphone-18-pro-max"
+      },
+      {
+        "label": "iPhone 18 Pro",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/apple/iphone-18-pro"
+      },
+      {
+        "label": "iPhone Duo",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/apple/iphone-duo"
+      },
+      {
+        "label": "iPhone Air",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/apple/iphone-air"
+      },
+      {
+        "label": "Samsung Galaxy S26 Ultra",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/samsung/galaxy-s26-ultra"
+      },
+      {
+        "label": "Samsung Galaxy S26",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/samsung/galaxy-s26"
+      },
+      {
+        "label": "Samsung Galaxy S26+",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/samsung/galaxy-s26-plus"
+      },
+      {
+        "label": "Samsung Galaxy Z Fold8",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/samsung/galaxy-z-fold8"
+      },
+      {
+        "label": "Google Pixel 11 Pro Fold",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/google/pixel-11-pro-fold"
+      },
+      {
+        "label": "Google Pixel 11 Pro",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/google/pixel-11-pro"
+      },
+      {
+        "label": "Google Pixel 11",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/google/pixel-11"
+      },
+      {
+        "label": "Google Pixel 11 Pro XL",
+        "href": "https://www.vodafone.co.uk/mobile/pay-monthly-contracts/google/pixel-11-pro-xl"
+      },
+      {
+        "label": "New phones",
+        "href": "https://www.vodafone.co.uk/mobile/new-phones"
+      }
+    ]
+  },
+  {
+    "title": "Help and support",
+    "links": [
+      {
+        "label": "All help topics",
+        "href": "https://www.vodafone.co.uk/help"
+      },
+      {
+        "label": "Help with your device",
+        "href": "https://deviceguides.vodafone.co.uk/"
+      },
+      {
+        "label": "Lost or stolen devices",
+        "href": "https://www.vodafone.co.uk/help/mobile/lost-and-stolen"
+      },
+      {
+        "label": "Find a store",
+        "href": "https://stores.vodafone.co.uk/search"
+      },
+      {
+        "label": "Contact us",
+        "href": "https://www.vodafone.co.uk/contact-us"
+      },
+      {
+        "label": "Make a complaint",
+        "href": "https://www.vodafone.co.uk/help/account/how-to-complain"
+      },
+      {
+        "label": "Help and advice on fraud",
+        "href": "https://www.vodafone.co.uk/privacy/protecting-you"
+      },
+      {
+        "label": "Return a product",
+        "href": "https://www.vodafone.co.uk/help/orders/returns"
+      },
+      {
+        "label": "TOBi",
+        "href": "https://www.vodafone.co.uk/contact-us#p2pchat"
+      },
+      {
+        "label": "UK Charge Checker",
+        "href": "https://www.vodafone.co.uk/help/billing/charge-checker"
+      },
+      {
+        "label": "Social broadband",
+        "href": "https://www.vodafone.co.uk/broadband/essentials-broadband"
+      },
+      {
+        "label": "Broadband speed test",
+        "href": "https://www.vodafone.co.uk/broadband/speed-test"
+      },
+      {
+        "label": "Accessibility",
+        "href": "https://www.vodafone.co.uk/help/account/accessibility"
+      }
+    ]
+  },
+  {
+    "title": "Vodafone UK",
+    "links": [
+      {
+        "label": "About us",
+        "href": "https://www.vodafone.co.uk/about-us"
+      },
+      {
+        "label": "For investors",
+        "href": "https://www.vodafone.com/investors"
+      },
+      {
+        "label": "Blog",
+        "href": "https://www.vodafone.co.uk/blog"
+      },
+      {
+        "label": "News Centre",
+        "href": "https://www.vodafone.co.uk/newscentre/"
+      },
+      {
+        "label": "Modern Slavery Statement",
+        "href": "https://www.vodafone.com/our-impact/esg-reporting-centre?section=slavery-and-human-trafficking-statement"
+      },
+      {
+        "label": "Careers",
+        "href": "https://careers.vodafone.com/uk/"
+      },
+      {
+        "label": "Switch to Vodafone",
+        "href": "https://www.vodafone.co.uk/mobile/switch-to-vodafone-campaign-1"
+      },
+      {
+        "label": "Our partnerships",
+        "href": "https://www.vodafone.co.uk/mobile/partnerships"
+      },
+      {
+        "label": "VOXI",
+        "href": "https://www.voxi.co.uk/"
+      },
+      {
+        "label": "Talkmobile",
+        "href": "https://talkmobile.co.uk/"
+      },
+      {
+        "label": "VodafoneThree",
+        "href": "https://www.vodafonethree.com/"
+      },
+      {
+        "label": "Three UK",
+        "href": "https://www.three.co.uk/"
+      },
+      {
+        "label": "SMARTY",
+        "href": "https://smarty.co.uk/"
+      }
+    ]
+  }
+]
